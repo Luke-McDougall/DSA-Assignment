@@ -87,7 +87,6 @@ public class DSABTree<T> implements java.io.Serializable, DSATree<T>
         {
             keys[keyIndex] = new InternTreeNode(key, value);
             keyIndex++;
-            size++;
             if(keyIndex > 1)
             {
                 insertionSortKey();
@@ -381,6 +380,7 @@ public class DSABTree<T> implements java.io.Serializable, DSATree<T>
         {
             root = new ExternTreeNode(null);
             root.insert(key, value);
+            size++;
         }
         else if(root.childrenIndex == 0)
         {
@@ -393,6 +393,7 @@ public class DSABTree<T> implements java.io.Serializable, DSATree<T>
                 root.insert(key, value);
                 root.split();
             }
+            size++;
         }
         else
         {
@@ -418,6 +419,7 @@ public class DSABTree<T> implements java.io.Serializable, DSATree<T>
                 node.insert(key, value);
                 node.split();
             }
+            size++;
         }
         else
         {

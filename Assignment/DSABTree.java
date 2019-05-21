@@ -56,6 +56,13 @@ public class DSABTree<T> implements java.io.Serializable, DSATree<T>
             parent = inParent;
         }
 
+        /* Function: keyPresent
+         * Import: String key
+         * Export: boolean present
+         *
+         * Iterates over the keys in keys array and returns true if any of them
+         * are equal to the passed key
+         */
         public boolean keyPresent(String key)
         {
             boolean present = false;
@@ -71,6 +78,11 @@ public class DSABTree<T> implements java.io.Serializable, DSATree<T>
             return present;
         }
 
+        /* Function: insert
+         * Import: String key. T value
+         * Export: None
+         * Creates a new InternTreeNode with the passed key and value to the keys array.
+         */
         public void insert(String key, T value)
         {
             keys[keyIndex] = new InternTreeNode(key, value);
@@ -82,12 +94,12 @@ public class DSABTree<T> implements java.io.Serializable, DSATree<T>
             }
         }
 
-        public ExternTreeNode getChild(int index)
-        {
-            return children[index];
-        }
-
-        private void insertChild(ExternTreeNode child)
+        /* Function: insertChild
+         * Import: ExternTreeNode child
+         * Export: None
+         * Adds the passed node to this nodes children array and sorts it.
+         */
+        public void insertChild(ExternTreeNode child)
         {
             child.parent = this;
             children[childrenIndex] = child;
@@ -97,12 +109,7 @@ public class DSABTree<T> implements java.io.Serializable, DSATree<T>
                 insertionSortChild();
             }
         }
-
-        public String getKey(int index)
-        {
-            return keys[index].key;
-        }
-
+        
         /* Function: insertionSortKey
          * Import: None.
          * Export: None.
@@ -147,7 +154,12 @@ public class DSABTree<T> implements java.io.Serializable, DSATree<T>
             }
         }
 
-        private void removeChild(ExternTreeNode n)
+        /* Function removeChild
+         * Import: ExternTreeNode n
+         * Export: None
+         * Removes passed node from this nodes children array
+         */
+        public void removeChild(ExternTreeNode n)
         {
             boolean found = false;
             for(int i = 0; i < childrenIndex; i++)
@@ -165,58 +177,18 @@ public class DSABTree<T> implements java.io.Serializable, DSATree<T>
             childrenIndex--;
             children[childrenIndex] = null;
         }
-
-        public T getValue(int index)
-        {
-            return keys[index].value;
-        }
-
-        public String toString()
-        {
-            String str = "";
-            if(childrenIndex == 0)
-            {
-                for(int i = 0; i < keyIndex; i++)
-                {
-                    str += ((StockDay)keys[i].value).toCSV() + "\n";
-                }
-            }
-            else
-            {
-                for(int i = 0; i < childrenIndex; i++)
-                {
-                    str += children[i].toString();
-                    if( i < keyIndex)
-                    {
-                        str += ((StockDay)keys[i].value).toCSV() + "\n";
-                    }
-                }
-            }
-            return str;
-        }
-
-        public void values(DSAQueue<T> vals)
-        {
-            if(childrenIndex == 0)
-            {
-                for(int i = 0; i < keyIndex; i++)
-                {
-                    vals.enqueue(keys[i].value);
-                }
-            }
-            else
-            {
-                for(int i = 0; i < childrenIndex; i++)
-                {
-                    children[i].values(vals);
-                    if(i < keyIndex)
-                    {
-                        vals.enqueue(keys[i].value);
-                    }
-                }
-            }
-        }
-
+    
+        /* Function: split
+         * Import: None
+         * Export: None
+         *
+         * Finds the median key in the keys array and adds all keys less than
+         * the median to a new node and all keys greater than the median to another
+         * new node. The median key is added to this nodes parent. The two new nodes
+         * are added to this nodes parents children array and this node is removed 
+         * from it's parents children array. Split may be called again on the parent
+         * if necessary.
+         */
         public void split()
         {
             int medianIdx = keyIndex / 2; 
@@ -266,6 +238,80 @@ public class DSABTree<T> implements java.io.Serializable, DSATree<T>
                 if(parent.keyIndex > maxKeySize)
                 {
                     parent.split();
+                }
+            }
+        }
+        
+        //getters
+        public T getValue(int index)
+        {
+            return keys[index].value;
+        }
+        
+        public ExternTreeNode getChild(int index)
+        {
+            return children[index];
+        }
+
+        public String getKey(int index)
+        {
+            return keys[index].key;
+        }
+        
+        /* Function: toString
+         * Import: None
+         * Export: String str
+         * Recursive to string method used for saving contents of tree in CSV format
+         */ 
+        public String toString()
+        {
+            String str = "";
+            if(childrenIndex == 0)
+            {
+                for(int i = 0; i < keyIndex; i++)
+                {
+                    str += ((StockDay)keys[i].value).toCSV() + "\n";
+                }
+            }
+            else
+            {
+                for(int i = 0; i < childrenIndex; i++)
+                {
+                    str += children[i].toString();
+                    if( i < keyIndex)
+                    {
+                        str += ((StockDay)keys[i].value).toCSV() + "\n";
+                    }
+                }
+            }
+            return str;
+        }
+
+        /* Function: values
+         * Import: DSAQueue<T> vals
+         * Export: None
+         *
+         * Recursively stores all values in the tree in a queue used for saving 
+         * the tree in a binary file
+         */
+        public void values(DSAQueue<T> vals)
+        {
+            if(childrenIndex == 0)
+            {
+                for(int i = 0; i < keyIndex; i++)
+                {
+                    vals.enqueue(keys[i].value);
+                }
+            }
+            else
+            {
+                for(int i = 0; i < childrenIndex; i++)
+                {
+                    children[i].values(vals);
+                    if(i < keyIndex)
+                    {
+                        vals.enqueue(keys[i].value);
+                    }
                 }
             }
         }
@@ -379,7 +425,6 @@ public class DSABTree<T> implements java.io.Serializable, DSATree<T>
             boolean found = false;
             while(!found)
             {
-                //System.out.printf("numKeys %d, currIdx %d, key %s\n", numKeys, currIdx, key);
                 String temp = node.getKey(currIdx);
                 if(currIdx == 0 && key.compareTo(temp) < 0)
                 {

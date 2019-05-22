@@ -138,7 +138,7 @@ public class FileIOTree
 					String[] args = line.split(",");
 					try
 					{
-						String ticker = args[0];
+						String ticker = args[0];    //Create StockDay object
 						Date d = new Date(Integer.parseInt(args[1].substring(0,4)), 
 								          Integer.parseInt(args[1].substring(4,6)), 
 								          Integer.parseInt(args[1].substring(6)));
